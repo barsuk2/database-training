@@ -1,0 +1,446 @@
+-- MySQL dump 10.13  Distrib 8.0.20, for Linux (x86_64)
+--
+-- Host: localhost    Database: wiki
+-- ------------------------------------------------------
+-- Server version	8.0.20
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `changes`
+--
+
+DROP TABLE IF EXISTS `changes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `changes` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `docs_id` int unsigned DEFAULT NULL,
+  `changes` text NOT NULL,
+  `user_id` int unsigned DEFAULT NULL,
+  `date_of_changes` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Время внесения измений строки',
+  PRIMARY KEY (`id`),
+  KEY `date_of_changes_documents_fk` (`docs_id`),
+  CONSTRAINT `date_of_changes_documents_fk` FOREIGN KEY (`docs_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=411 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Таблица для фиксирования изменений в документах';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `docs_media`
+--
+
+DROP TABLE IF EXISTS `docs_media`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `docs_media` (
+  `docs_id` int unsigned NOT NULL,
+  `media_id` int unsigned NOT NULL,
+  `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`docs_id`,`media_id`),
+  KEY `media_id_fk` (`media_id`),
+  CONSTRAINT `doc_media_id_fk` FOREIGN KEY (`docs_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `media_id_fk` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='В таблице содержаться все ссылки на медиафайлы в разрезе документов';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `docs_tags_`
+--
+
+DROP TABLE IF EXISTS `docs_tags_`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `docs_tags_` (
+  `docs_id` int unsigned NOT NULL,
+  `tags_id` int unsigned NOT NULL,
+  `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`docs_id`,`tags_id`),
+  KEY `tags_id_fk` (`tags_id`),
+  CONSTRAINT `documents_id_fk` FOREIGN KEY (`docs_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tags_id_fk` FOREIGN KEY (`tags_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='В таблице содержаться все ссылки на теги в разрезе документов';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `documents`
+--
+
+DROP TABLE IF EXISTS `documents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `documents` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'id сатьи',
+  `language_id` int unsigned DEFAULT NULL COMMENT 'язык статьи',
+  `user_id` int unsigned NOT NULL COMMENT 'автор документа',
+  `doc_type_id` int unsigned NOT NULL,
+  `title_doc` varchar(100) NOT NULL,
+  `text_doc` varchar(300) DEFAULT 'Пустой документ',
+  `isibility_doc` int DEFAULT '0',
+  `create_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'дата создания',
+  `update_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'дата последнего редактироваиня',
+  PRIMARY KEY (`id`),
+  KEY `documents_user_id_fk` (`user_id`),
+  KEY `documents__documents_languages_language_doc_id_fk` (`language_id`),
+  KEY `documents_documents_types_doc_type_id_fk` (`doc_type_id`),
+  CONSTRAINT `documents__documents_languages_language_doc_id_fk` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `documents_documents_types_doc_type_id_fk` FOREIGN KEY (`doc_type_id`) REFERENCES `documents_types` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `documents_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=303 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Теги';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `ADD_CHANGES` AFTER INSERT ON `documents` FOR EACH ROW BEGIN
+        INSERT INTO changes (docs_id, changes, user_id) VALUES (NEW.id,NEW.text_doc,NEW.user_id);
+    END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `update_changes` AFTER UPDATE ON `documents` FOR EACH ROW BEGIN
+        IF (OLD.text_doc != NEW.text_doc) THEN
+        INSERT INTO changes (docs_id, changes, user_id)
+        VALUES (NEW.id,CONCAT('MODIFY text_doc:', NEW.text_doc),NEW.user_id);
+        ELSEIF (OLD.title_doc != NEW.title_doc) THEN
+            INSERT INTO changes (docs_id, changes, user_id)
+            VALUES (NEW.id,CONCAT('MODIFY title_doc:', NEW.title_doc),NEW.user_id);
+        ELSEIF (OLD.language_id != NEW.language_id) THEN
+            INSERT INTO changes (docs_id, changes, user_id)
+            VALUES (NEW.id,CONCAT('MODIFY language_id:', NEW.language_id),NEW.user_id);
+
+        ELSEIF (OLD.user_id != NEW.user_id) THEN
+            INSERT INTO changes (docs_id, changes, user_id)
+            VALUES (NEW.id,CONCAT('MODIFY user_id:', NEW.user_id),NEW.user_id);
+        END IF ;
+    END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `documents_types`
+--
+
+DROP TABLE IF EXISTS `documents_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `documents_types` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `doc_types` varchar(50) DEFAULT NULL,
+  `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Таблица с типами документов';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Temporary view structure for view `full_docs_views`
+--
+
+DROP TABLE IF EXISTS `full_docs_views`;
+/*!50001 DROP VIEW IF EXISTS `full_docs_views`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `full_docs_views` AS SELECT 
+ 1 AS `title_doc`,
+ 1 AS `text_doc`,
+ 1 AS `filename`,
+ 1 AS `size`,
+ 1 AS `media_types_id`,
+ 1 AS `name`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `groups_users`
+--
+
+DROP TABLE IF EXISTS `groups_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `groups_users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `group_name` varchar(50) DEFAULT NULL,
+  `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Группы пользователей';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `language`
+--
+
+DROP TABLE IF EXISTS `language`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `language` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='язык';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `media`
+--
+
+DROP TABLE IF EXISTS `media`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `media` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned DEFAULT NULL,
+  `filename` varchar(255) DEFAULT NULL COMMENT 'Путь к файлу',
+  `size` int NOT NULL COMMENT 'Размер файла',
+  `metadata` json DEFAULT NULL,
+  `media_types_id` int unsigned NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Время создания строки',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Время обновления строки',
+  PRIMARY KEY (`id`),
+  KEY `media_user_id_fk` (`user_id`),
+  KEY `media_media_types_media_types_id_fk` (`media_types_id`),
+  CONSTRAINT `media_media_types_media_types_id_fk` FOREIGN KEY (`media_types_id`) REFERENCES `media_types` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `media_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=301 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Медиафайлы';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `media_types`
+--
+
+DROP TABLE IF EXISTS `media_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `media_types` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Идентификатор строки',
+  `name` varchar(255) NOT NULL COMMENT 'Название типа',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Время создания строки',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Время обновления строки',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Типы медиафайлов';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Temporary view structure for view `media_types_views_user`
+--
+
+DROP TABLE IF EXISTS `media_types_views_user`;
+/*!50001 DROP VIEW IF EXISTS `media_types_views_user`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `media_types_views_user` AS SELECT 
+ 1 AS `filename`,
+ 1 AS `name`,
+ 1 AS `lf_name`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `profiles`
+--
+
+DROP TABLE IF EXISTS `profiles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `profiles` (
+  `user_id` int unsigned NOT NULL COMMENT 'Ссылка на пользователя',
+  `photo_id` int unsigned DEFAULT '1',
+  `gender` char(1) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT 'N' COMMENT 'Пол',
+  `language_id` int unsigned NOT NULL DEFAULT '1',
+  `birthday` date DEFAULT NULL COMMENT 'Дата рождения',
+  `grops_users_id` int unsigned NOT NULL DEFAULT '2',
+  `city` varchar(130) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Город проживания',
+  `country` varchar(130) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Страна проживания',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Время создания строки',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Время обновления строки',
+  KEY `profiles_user_id_fk` (`user_id`),
+  KEY `profiles_groups_users_id_fk` (`grops_users_id`),
+  KEY `profiles_media_photo_id_fk` (`photo_id`),
+  KEY `profiles_birthday_idx` (`birthday`),
+  CONSTRAINT `profiles_groups_users_id_fk` FOREIGN KEY (`grops_users_id`) REFERENCES `groups_users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `profiles_media_photo_id_fk` FOREIGN KEY (`photo_id`) REFERENCES `media` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `profiles_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Профили';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Temporary view structure for view `show_docs_by_group_name_view`
+--
+
+DROP TABLE IF EXISTS `show_docs_by_group_name_view`;
+/*!50001 DROP VIEW IF EXISTS `show_docs_by_group_name_view`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `show_docs_by_group_name_view` AS SELECT 
+ 1 AS `title_doc`,
+ 1 AS `FL_name`,
+ 1 AS `group_name`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `tags`
+--
+
+DROP TABLE IF EXISTS `tags`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tags` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `tags_name_idx` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Теги для статей';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `user_status`
+--
+
+DROP TABLE IF EXISTS `user_status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_status` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Идентификатор строки',
+  `name` varchar(255) NOT NULL COMMENT 'Название типа',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Время создания строки',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Время обновления строки',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Типы пользователя';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Идентификатор строки',
+  `status_id` int unsigned NOT NULL DEFAULT '1' COMMENT 'удален, не удален',
+  `first_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'Имя пользователя',
+  `last_name` varchar(100) NOT NULL COMMENT 'Фамилия пользователя',
+  `email` varchar(100) NOT NULL COMMENT 'Почта',
+  `phone` varchar(100) NOT NULL COMMENT 'Телефон',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_uq` (`email`),
+  KEY `users_id_user_status_status_id_fk` (`status_id`),
+  CONSTRAINT `users_id_user_status_status_id_fk` FOREIGN KEY (`status_id`) REFERENCES `user_status` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Пользователи';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `add_profiles` AFTER INSERT ON `users` FOR EACH ROW BEGIN
+        INSERT INTO profiles (USER_ID) VALUES (NEW.id);
+    end */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Final view structure for view `full_docs_views`
+--
+
+/*!50001 DROP VIEW IF EXISTS `full_docs_views`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `full_docs_views` AS select `documents`.`title_doc` AS `title_doc`,`documents`.`text_doc` AS `text_doc`,`m`.`filename` AS `filename`,`m`.`size` AS `size`,`m`.`media_types_id` AS `media_types_id`,`mt`.`name` AS `name` from (((`documents` join `docs_media` `dm` on((`documents`.`id` = `dm`.`docs_id`))) join `media` `m` on((`dm`.`media_id` = `m`.`id`))) join `media_types` `mt` on((`m`.`media_types_id` = `mt`.`id`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `media_types_views_user`
+--
+
+/*!50001 DROP VIEW IF EXISTS `media_types_views_user`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `media_types_views_user` AS select `m`.`filename` AS `filename`,`mt`.`name` AS `name`,concat(`u`.`last_name`,' ',convert(`u`.`first_name` using utf8mb4)) AS `lf_name` from ((`media` `m` left join `media_types` `mt` on((`m`.`media_types_id` = `mt`.`id`))) join `users` `u` on((`m`.`user_id` = `u`.`id`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `show_docs_by_group_name_view`
+--
+
+/*!50001 DROP VIEW IF EXISTS `show_docs_by_group_name_view`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `show_docs_by_group_name_view` AS select `documents`.`title_doc` AS `title_doc`,concat(convert(`u`.`first_name` using utf8mb4),' ',`u`.`last_name`) AS `FL_name`,`gu`.`group_name` AS `group_name` from (((`documents` join `users` `u` on((`documents`.`user_id` = `u`.`id`))) join `profiles` `p` on((`u`.`id` = `p`.`user_id`))) join `groups_users` `gu` on((`p`.`grops_users_id` = `gu`.`id`))) where (`gu`.`group_name` = 'Магистры') */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2020-07-15 21:12:10
